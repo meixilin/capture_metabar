@@ -1,0 +1,8 @@
+#####
+# metabarcode sequence length - primers + 20 (minimum overlap require) for dada2
+#####
+LENGTH_12SV5="81"
+LENGTH_18S="200"
+LENGTH_PITS="480"
+LENGTH_CO1="625"
+LENGTH_MAMM2="55"
