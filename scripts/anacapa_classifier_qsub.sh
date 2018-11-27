@@ -5,7 +5,7 @@
 #$ -m bea
 #$ -M meixilin
 #$ -o /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/ccapture_anacapa_classifier_10292018.out.txt
-#$ -e /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/capture_anacapa_classifier_10292018.err.txtS
+#$ -e /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/capture_anacapa_classifier_10292018.err.txt
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:    " `hostname -s`
