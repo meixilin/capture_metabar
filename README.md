@@ -27,3 +27,10 @@ please refer to the config file
 
 1. for obitools: https://git.metabarcoding.org/explore/projects
 2. for anacapa: https://github.com/limey-bean/Anacapa
+
+# Side notes
+
+> Date: 11/27/2018
+
+Remember to set `BLCAperMINlen="0.8"`in the `anacapa_vars.sh`
+
