@@ -34,3 +34,15 @@ please refer to the config file
 
 Remember to set `BLCAperMINlen="0.8"`in the `anacapa_vars.sh`
 
+# Anacapa important parameters
+
+> In QC part
+
+`-m 30` instead of default `-m 100` , here the minimum length after quality trimming is `30` instead of `100`. 
+
+> In run_bowtie2_blca.sh
+
+`-b` percent similarity == 0.8 (this is default)
+
+`-p` percent length match == 0.8 (this is default)
+
