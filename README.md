@@ -34,7 +34,9 @@ please refer to the config file
 
 Remember to set `BLCAperMINlen="0.8"`in the `anacapa_vars.sh`
 
-# Anacapa important parameters
+# Important parameters
+
+## Anacapa 
 
 > In QC part
 
@@ -45,4 +47,12 @@ Remember to set `BLCAperMINlen="0.8"`in the `anacapa_vars.sh`
 `-b` percent similarity == 0.8 (this is default)
 
 `-p` percent length match == 0.8 (this is default)
+
+## OBITools 
+
+> In 
+
+sequence similarity cutoff is `0.95`
+
+
 
