@@ -118,6 +118,7 @@ phylist3d <- lapply(phylist3, function(xx) {
 })
 phylist3d
 lapply(phylist3d, function(xx) {sample_sums(xx)})
+save(phylist3d, file = "phylist3d.RData")
 
 
 # phylist3d --------
@@ -188,6 +189,27 @@ p <- p + ggtitle('Rarified Samples') +
     theme(panel.grid.minor.y=element_blank(),panel.grid.minor.x=element_blank(),panel.grid.major.y=element_blank(),panel.grid.major.x=element_blank(), legend.position = "none")
 p
 
-
-
-
+# continue analysis on phylist3d --------
+load("phylist3d.RData")
+# glom to family level and convert to boolean 
+dffam <- lapply(phylist3d, function(xx) {
+    xx <- as.data.frame(otu_table(xx)) %>%
+        tibble::rownames_to_column(var = "sum.taxonomy") %>%
+        glom_tax_df(., taxlevel = "Family")
+    xx <- (xx > 0) * 1 
+})
+# plot the family level result 
+phyfam <- lapply(dffam, function(xx) {
+    OTU <- otu_table(xx, taxa_are_rows = TRUE)
+    taxmat <- matrix(rownames(xx), nrow = nrow(xx), ncol = 1)
+    colnames(taxmat) <- "Family"
+    rownames(taxmat) <- rownames(xx)
+    TAX <- tax_table(taxmat)
+    phy <- phyloseq(OTU, TAX)
+})
+phyloseq::plot_heatmap(phyfam$`18S`, trans = NULL, method = NULL)
+# only take the mvp 
+dfmvp <- lapply(dffam, function(xx) {
+    xx <- cbind(xx[,c("MVP.DNA.2", "MVP.DNA.3")])
+})
+gplots::venn(dfmvp$`18S`)
