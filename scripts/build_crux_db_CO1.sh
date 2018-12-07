@@ -1,11 +1,11 @@
 #!/bin/bash
-#$ -l highmem,highp,h_rt=10:00:00,h_data=96G
-#$ -N build_crux_db_CO1_12032018
+#$ -l highmem,highp,h_rt=48:00:00,h_data=48G
+#$ -N build_crux_db_CO1_12042018
 #$ -cwd
 #$ -m bea
 #$ -M meixilin
-#$ -o /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/build_crux_db_CO1_12032018.out.txt
-#$ -e /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/build_crux_db_CO1_12032018.err.txt
+#$ -o /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/build_crux_db_CO1_12042018.out.txt
+#$ -e /u/project/rwayne/meixilin/capture_array/metabar/anacapa/qsub_log/build_crux_db_CO1_12042018.err.txt
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:    " `hostname -s`
