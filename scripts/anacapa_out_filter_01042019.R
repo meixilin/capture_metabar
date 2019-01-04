@@ -1,4 +1,4 @@
-# Title: read in and plot anacapa output from capture metabar --------
+# Title: read in and subset anacapa output from capture metabar --------
 # Author: Meixi Lin
 # Date: Wed Nov 28 10:41:30 2018
 # Author:
@@ -20,71 +20,22 @@ date() # the execution date
 primers <- c("12SV5", "MAMM2", "PITS", "18S", "CO1")
 samples <- c("FOD.DNA.1", "MVP.DNA.2", "MVP.DNA.3", "pcr.blank", "positive.mammal", "PPB.DNA.1", "SMM.DNA.1", "SMV.DNA.1", "SSA.DNA.1", "extract.blank")
 
-# function def --------
-# rarefaction adapted from Emily's script 
-custom_rarefaction_2 <- function(physeq_object, sample_size = 10000, replicates = 10, myseed = FALSE) 
-{
-    reps <- replicate(replicates, phyloseq::rarefy_even_depth(physeq_object, 
-                                                              sample.size = sample_size,
-                                                              rngseed = myseed))
-    dfs <- lapply(reps, function(x) as.data.frame(x@otu_table@.Data))
-    dfs <- lapply(dfs, function(x) tibble::rownames_to_column(x, 
-                                                              var = "taxonomy"))
-    dfs <- do.call(rbind.data.frame, dfs)
-    otu <- dfs %>% dplyr::group_by(taxonomy) %>% dplyr::summarize_all(dplyr::funs(sum(.)/replicates)) %>% 
-        dplyr::mutate_if(is.numeric, dplyr::funs(round)) %>% 
-        data.frame %>% tibble::column_to_rownames("taxonomy") %>% 
-        as.matrix
-    OTU <- phyloseq::otu_table(otu, taxa_are_rows = T)
-    TAX <- physeq_object@tax_table
-    physeq_to_return <- phyloseq::phyloseq(OTU, TAX)
-    physeq_to_return <- phyloseq::merge_phyloseq(physeq_to_return, 
-                                                 physeq_object@sam_data)
-    return(physeq_to_return)
-}
-
-glom_tax_df <- function(df, taxlevel = taxlevel) {
-    # split sum.taxonomy
-    glomphy <- cbind(df[,-1], reshape2::colsplit(df[,1], ";", names = c("Phylum", "Class", "Order", "Family", "Genus", "Species")))
-    
-    # change "NA" or "" to "unknown" for all cells 
-    glomphy <- glomphy %>%
-        mutate(Phylum = ifelse(is.na(Phylum) | Phylum == "", "unknown", Phylum)) %>%
-        mutate(Class = ifelse(is.na(Class) | Class == "", "unknown", Class)) %>%
-        mutate(Order = ifelse(is.na(Order) | Order == "", "unknown", Order)) %>%
-        mutate(Family = ifelse(is.na(Family) | Family == "", "unknown", Family)) %>%
-        mutate(Genus = ifelse(is.na(Genus) | Genus == "", "unknown", Genus)) %>%
-        mutate(Species = ifelse(is.na(Species)| Species == "", "unknown", Species))
-    
-    # sumup by standards
-    glomphy <- glomphy %>%
-        group_by_at(taxlevel) %>%
-        # group_by(Phylum) %>%
-        summarize_if(is.numeric, sum) %>%
-        data.frame %>%
-        tibble::column_to_rownames(taxlevel)
-    glomphy <- glomphy[which(rowSums(glomphy) > 0),]
-    
-    return(glomphy)
-}
-
 # read in the data --------
-sumlist <- lapply(primers, function(xx) {
-    sum60 <- read.delim(file = paste0("anacapa_out/", xx, "_taxonomy_tables/Summary_by_percent_confidence/60/", xx, "_ASV_sum_by_taxonomy_60.txt"), stringsAsFactors = F)
-    samplename <- colnames(sum60)[-1] %>%
-        strsplit(split = "_") %>%
-        lapply(function(xx) {xx <- xx[2]}) %>%
-        unlist
-    colnames(sum60)[-1] <- samplename
-    return(sum60)
-})
-
 # read raw asv
 asv <- read.delim(file = "anacapa_out/12SV5_taxonomy_tables/12SV5_ASV_taxonomy_detailed.txt", stringsAsFactors = F)
 samplename <- colnames(asv)[-(1:4)] %>%
     strsplit(split = "_") %>%
     lapply(function(xx) {xx <- xx[2]}) %>%
     unlist
+
+# subset the asv by 
+# 1. length 
+# 2. taxonomy confidence 
+asvnew <- asv %>%
+    filter(input_sequence_length > 30)
+    
+
+# subset the data fromwe 
 
 names(sumlist) <- primers
 # read metadata 
