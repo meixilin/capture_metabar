@@ -128,13 +128,16 @@ phylist3d
 lapply(phylist3d, function(xx) {sample_sums(xx)})
 save(phylist3d, file = "phylist3d.RData")
 
-
 # phylist3d --------
+load("phylist3d.RData")
+######## phylist3d plot
 # plot_barplot 
 plot_bar(phylist3d$`12SV5`, fill = "Species")
 plot_bar(phylist3d$`MAMM2`, fill = "Species")
+plot_bar(phylist3d$`CO1`, fill = "Species")
 plot_bar(phylist3d$`PITS`, fill = "Species")
-physeq <- phylist3d$PITS
+plot_bar(phylist3d$`18S`, fill = "Species")
+physeq <- phylist3d$CO1
 TopNOTUs <- names(sort(taxa_sums(physeq), TRUE)[1:10])
 phy10   <- prune_taxa(TopNOTUs, physeq)
 # you can also convert to relative abundance 
@@ -181,7 +184,7 @@ phylist3dr <- lapply(phylist3d, function(xx) {
 })
 xxr.18S <- custom_rarefaction_2(phylist3d, sample_size = 10000, replicates = rarefaction_reps, myseed = seed)
 xxr.12SV5 <- custom_rarefaction_2(phylist3d$`12SV5`, sample_size = 30000, replicates = rarefaction_reps, myseed = seed)
-
+plot_bar(xxr.12SV5, fill = "Species")
 
 #Check rarefaction, CHANGE THIS LINE BY OBJECT ####
 physeq_obj <- phylist3d$`12SV5`

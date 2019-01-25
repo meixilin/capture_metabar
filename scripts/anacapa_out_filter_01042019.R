@@ -15,31 +15,25 @@ library(dplyr)
 library(reshape2)
 library(phyloseq)
 library(vegan)
+library(ggplot2)
 date() # the execution date
 
 primers <- c("12SV5", "MAMM2", "PITS", "18S", "CO1")
 samples <- c("FOD.DNA.1", "MVP.DNA.2", "MVP.DNA.3", "pcr.blank", "positive.mammal", "PPB.DNA.1", "SMM.DNA.1", "SMV.DNA.1", "SSA.DNA.1", "extract.blank")
 
 # read in the data --------
-# read raw asv
-asv <- read.delim(file = "anacapa_out/12SV5_taxonomy_tables/12SV5_ASV_taxonomy_detailed.txt", stringsAsFactors = F)
-samplename <- colnames(asv)[-(1:4)] %>%
-    strsplit(split = "_") %>%
-    lapply(function(xx) {xx <- xx[2]}) %>%
-    unlist
-
-# subset the asv by 
-# 1. length 
-# 2. taxonomy confidence 
-asvnew <- asv %>%
-    filter(input_sequence_length > 30)
-    
-
-# subset the data fromwe 
-
-names(sumlist) <- primers
-# read metadata 
+for (ii in primers) {
+    asv <- read.delim(file = paste0("anacapa_out/",ii,"_taxonomy_tables/",ii,"_ASV_taxonomy_detailed.txt"), stringsAsFactors = F)
+    asv.b <- read.delim(file = paste0("anacapa_out/",ii,"_taxonomy_tables/",ii,"_ASV_taxonomy_brief.txt"), stringsAsFactors = F)
+    asvnew <- asv %>%
+        filter(nchar(sequence) > 30 | nchar(sequencesF) > 30 | nchar(sequencesR) > 30)
+    filename <- paste0("anacapa_out/",ii,"_taxonomy_tables/",ii,"_ASV_taxonomy_detailed_l30.txt")
+    write.table(asvnew, file = filename, quote = F, sep = "\t", row.names = F)
+    index <- asv.brief[,1] %in% asvnew[,1]
+    asvnew.b <- asv.b 
+}
 biom <- read.csv(file = "anacapa_out/metadata.csv", stringsAsFactors = F)
+physeq <- convert_anacapa_to_phyloseq(asvnew, biom)
 
 # build phyloseq from sum.taxonomy --------
 phylist <- lapply(sumlist, function(xx) {
@@ -125,25 +119,31 @@ rarefaction_depth <- 10000
 rarefaction_reps  <- 10
 seed <- 7
 
+# sample sums #####
+lapply(phylist3d, sample_sums)
+
 # perform ####
 phylist3dr <- lapply(phylist3d, function(xx) {
     xxr <- custom_rarefaction_2(xx, sample_size = rarefaction_depth, replicates = rarefaction_reps, myseed = seed)
     return(xxr)
 })
+save
 xxr.18S <- custom_rarefaction_2(phylist3d, sample_size = 10000, replicates = rarefaction_reps, myseed = seed)
-xxr.12SV5 <- custom_rarefaction_2(phylist3d$`12SV5`, sample_size = 30000, replicates = rarefaction_reps, myseed = seed)
+xxr.CO1 <- custom_rarefaction_2(phylist3d$`CO1`, sample_size = 5000, replicates = rarefaction_reps, myseed = seed)
+xxr.12SV5 <- custom_rarefaction_2(phylist3d$`12SV5`, sample_size = 40000, replicates = rarefaction_reps, myseed = seed)
+xxr.PITS <- custom_rarefaction_2(phylist3d$PITS, sample_size = 15000, replicates = rarefaction_reps, myseed = seed)
 
 
 #Check rarefaction, CHANGE THIS LINE BY OBJECT ####
-physeq_obj <- phylist3d$`12SV5`
-physeq_obj_rare <- xxr.12SV5
+physeq_obj <- phylist3d$PITS
+physeq_obj_rare <- xxr.PITS
 sample_sums(physeq_obj_rare)
 hist(sample_sums(physeq_obj_rare))
 dim(otu_table(physeq_obj_rare))
 dim(otu_table(physeq_obj))
 
 # OPTIONAL: plot rarefaction
-p <- ggrare(physeq_obj_rare,step = 100, color = "index", se=FALSE) + theme_bw() + theme_ranacapa()
+p <- ranacapa::ggrare(physeq_obj_rare,step = 100, color = "index", se=FALSE)
 p <- p + ggtitle('Rarified Samples') +
     theme(plot.title = element_text(hjust = 0.5)) + theme_ranacapa() +
     theme(panel.grid.minor.y=element_blank(),panel.grid.minor.x=element_blank(),panel.grid.major.y=element_blank(),panel.grid.major.x=element_blank(), legend.position = "none")

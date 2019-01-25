@@ -54,5 +54,8 @@ Remember to set `BLCAperMINlen="0.8"`in the `anacapa_vars.sh`
 
 sequence similarity cutoff is `0.95`
 
+# Known issues 
 
+1. The CO1 was full length compared to default half-length 
+2. The length cutoff set for 12SV5 resulted in that some shorter sequences (e.g. 10 bps) were analyzed and the sequences were assigned taxonomy. these sequences need to be out. 
 
